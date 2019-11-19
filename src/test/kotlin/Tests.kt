@@ -22,28 +22,33 @@ class TestMappingsReader : MappingsReader() {
 //}
 ////TODO: test this situation
 //val x : A<Int>.B<String>? = null
-class Tests{
+class Tests {
     private val mappings: MappingSet = TestMappingsReader().read()
 
-    private fun testRemap(testName : String) {
-        assertEquals(File("src/test/resources/$testName/Expected.kt").readText().trim(),
-            Remapper.remap(File("src/test/resources/$testName/Original.kt"),mappings).trim())
+    private fun testRemap(testName: String) {
+        val dir = "src/test/resources/$testName/"
+        val result = Remapper.remap(File("$dir/Original.kt"), mappings).trim().replace("\n\n","\n")
+        File("$dir/tempResult.kt").writeText(result)
+        assertEquals(
+            File("$dir/Expected.kt").readText().trim(),
+            result
+        )
 
     }
     //TODO: remember to test preserving space and comments!
 
     @Test
-    fun testImport(){
+    fun testImport() {
         testRemap("import")
     }
 
     @Test
-    fun testTypeAlias(){
+    fun testTypeAlias() {
         testRemap("typealias")
     }
 
     @Test
-    fun testImportedType(){
+    fun testImportedType() {
         testRemap("importedType")
     }
 }

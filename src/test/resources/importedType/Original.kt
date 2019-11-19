@@ -1,1 +1,2 @@
-import java.io.File
+import net.obf.TestObf
+val x : TestObf? = null
