@@ -17,7 +17,8 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version")
     testImplementation ("org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlin_version")
     testImplementation ("org.jetbrains.kotlin:kotlin-test-common:$kotlin_version")
-    implementation ("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin_version")
+//    implementation ("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin_version")
+    api ("org.jetbrains.kotlin:kotlin-compiler:$kotlin_version")
 }
 
 tasks {

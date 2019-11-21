@@ -1,5 +1,8 @@
 package kastree.ast
 
+import kastree.ast.Node.Expr
+
+
 sealed class Node {
     var tag: Any? = null
 
@@ -214,6 +217,9 @@ sealed class Node {
     ) : Node()
 
     sealed class Expr : Node() {
+        ////// New stuff
+//        data class Qualified(val qualifier : Expr, val qualified : Expr) : Expr()
+        /////////////////////////
         data class If(
             val expr: Expr,
             val body: Expr,

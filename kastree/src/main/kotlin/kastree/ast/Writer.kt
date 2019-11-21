@@ -15,6 +15,7 @@ open class Writer(
         elems.forEach { it.writeExtrasLineEnd() }
         append('\n')
     }
+
     protected fun line() = endLine()
     protected fun line(str: String) = append(indent).append(str).endLine()
     protected fun lineBegin(str: String = "") = append(indent).append(str)
@@ -23,18 +24,22 @@ open class Writer(
     protected fun append(str: String) = also { app.append(str) }
     protected fun appendName(name: String) =
         if (name.shouldEscapeIdent) append("`$name`") else append(name)
+
     protected fun appendNames(names: List<String>, sep: String) = also {
         names.forEachIndexed { index, name ->
             if (index > 0) append(sep)
             appendName(name)
         }
     }
+
     protected fun <T> indented(fn: () -> T): T = run {
         indent += "    "
         fn().also { indent = indent.dropLast(4) }
     }
 
-    fun write(v: Node) { visit(v, v) }
+    fun write(v: Node) {
+        visit(v, v)
+    }
 
     override fun visit(v: Node?, parent: Node) {
         v?.writeExtrasBefore()
@@ -53,13 +58,15 @@ open class Writer(
                     if (wildcard) append(".*") else if (alias != null) append(" as ").appendName(alias)
                 }
                 is Node.Decl.Structured -> childMods().also {
-                    append(when (form) {
-                        Node.Decl.Structured.Form.CLASS -> "class "
-                        Node.Decl.Structured.Form.ENUM_CLASS -> "enum class "
-                        Node.Decl.Structured.Form.INTERFACE -> "interface "
-                        Node.Decl.Structured.Form.OBJECT -> "object "
-                        Node.Decl.Structured.Form.COMPANION_OBJECT -> "companion object "
-                    })
+                    append(
+                        when (form) {
+                            Node.Decl.Structured.Form.CLASS -> "class "
+                            Node.Decl.Structured.Form.ENUM_CLASS -> "enum class "
+                            Node.Decl.Structured.Form.INTERFACE -> "interface "
+                            Node.Decl.Structured.Form.OBJECT -> "object "
+                            Node.Decl.Structured.Form.COMPANION_OBJECT -> "companion object "
+                        }
+                    )
                     if (form != Node.Decl.Structured.Form.COMPANION_OBJECT || name != "Companion") appendName(name)
                     bracketedChildren(typeParams)
                     children(primaryConstructor)
@@ -88,7 +95,8 @@ open class Writer(
                     // to avoid ambiguities with the next item
                     // See: https://youtrack.jetbrains.com/issue/KT-25581
                     if ((form == Node.Decl.Structured.Form.COMPANION_OBJECT ||
-                        form == Node.Decl.Structured.Form.OBJECT) && name == "Companion" && members.isEmpty())
+                                form == Node.Decl.Structured.Form.OBJECT) && name == "Companion" && members.isEmpty()
+                    )
                         append("{}")
                 }
                 is Node.Decl.Structured.Parent.CallConstructor -> {
@@ -251,7 +259,7 @@ open class Writer(
                     // Some operations don't have separators
                     val noSep = oper is Node.Expr.BinaryOp.Oper.Token && oper.token.let {
                         it == Node.Expr.BinaryOp.Token.RANGE || it == Node.Expr.BinaryOp.Token.DOT ||
-                            it == Node.Expr.BinaryOp.Token.DOT_SAFE
+                                it == Node.Expr.BinaryOp.Token.DOT_SAFE
                     }
                     children(listOf(lhs, oper, rhs), if (noSep) "" else " ")
                 }
@@ -291,13 +299,15 @@ open class Writer(
                 is Node.Expr.StringTmpl.Elem.UnicodeEsc ->
                     append("\\u").append(digits)
                 is Node.Expr.StringTmpl.Elem.RegularEsc ->
-                    append('\\').append(when (char) {
-                        '\b' -> 'b'
-                        '\n' -> 'n'
-                        '\t' -> 't'
-                        '\r' -> 'r'
-                        else -> char
-                    })
+                    append('\\').append(
+                        when (char) {
+                            '\b' -> 'b'
+                            '\n' -> 'n'
+                            '\t' -> 't'
+                            '\r' -> 'r'
+                            else -> char
+                        }
+                    )
                 is Node.Expr.StringTmpl.Elem.LongTmpl ->
                     append("\${").also { children(expr) }.append('}')
                 is Node.Expr.Const ->
@@ -426,6 +436,7 @@ open class Writer(
         if (extrasMap == null) return
         // Write everything before
         writeExtras(extrasMap.extrasBefore(this))
+
     }
 
     protected open fun Node.writeExtrasAfter() {
@@ -508,7 +519,8 @@ open class Writer(
                 mods.forEachIndexed { index, mod ->
                     children(mod)
                     if (newlines && (mod is Node.Modifier.AnnotationSet ||
-                            mods.getOrNull(index + 1) is Node.Modifier.AnnotationSet))
+                                mods.getOrNull(index + 1) is Node.Modifier.AnnotationSet)
+                    )
                         lineEnd().lineBegin()
                     else append(' ')
                 }
@@ -519,11 +531,11 @@ open class Writer(
         if (mods.isNotEmpty()) {
             // As a special case, if there is a trailing annotation with no args and the ref has a paren which is a paren
             // type or a non-receiver fn type, then we need to add an empty set of parens ourselves
-            val lastAnn = (mods.lastOrNull() as? Node.Modifier.AnnotationSet)?.anns?.
-                singleOrNull()?.takeIf { it.args.isEmpty() }
+            val lastAnn =
+                (mods.lastOrNull() as? Node.Modifier.AnnotationSet)?.anns?.singleOrNull()?.takeIf { it.args.isEmpty() }
             val shouldAddParens = lastAnn != null &&
-                (ref is Node.TypeRef.Paren || (ref is Node.TypeRef.Func && (
-                    ref.receiverType == null || ref.receiverType.ref is Node.TypeRef.Paren)))
+                    (ref is Node.TypeRef.Paren || (ref is Node.TypeRef.Func && (
+                            ref.receiverType == null || ref.receiverType.ref is Node.TypeRef.Paren)))
             (this as Node).children(mods, " ")
             if (shouldAddParens) append("()")
             append(' ')
@@ -567,9 +579,11 @@ open class Writer(
         // See: https://youtrack.jetbrains.com/issue/KT-25578
         // TODO: is there a better place to do this?
         if (v !is Node.Stmt.Decl || v.decl !is Node.Decl.Structured || v.decl.members.isNotEmpty() ||
-            v.decl.form != Node.Decl.Structured.Form.CLASS) return false
+            v.decl.form != Node.Decl.Structured.Form.CLASS
+        ) return false
         if (next !is Node.Stmt.Expr || (next.expr !is Node.Expr.Paren &&
-            (next.expr !is Node.Expr.Annotated || next.expr.expr !is Node.Expr.Paren))) return false
+                    (next.expr !is Node.Expr.Annotated || next.expr.expr !is Node.Expr.Paren))
+        ) return false
         return true
     }
 
@@ -604,11 +618,12 @@ open class Writer(
         }
 
     // We accept lots of false positives to be simple and not have to bring in JVM dep to do accurate check
-    protected val String.shouldEscapeIdent get() =
-        KEYWORDS.contains(this) ||
-        all { it == '_' } ||
-        first() in '0'..'9' ||
-        any { it !in 'a'..'z' && it !in 'A'..'Z' && it !in '0'..'9' && it != '_' }
+    protected val String.shouldEscapeIdent
+        get() =
+            KEYWORDS.contains(this) ||
+                    all { it == '_' } ||
+                    first() in '0'..'9' ||
+                    any { it !in 'a'..'z' && it !in 'A'..'Z' && it !in '0'..'9' && it != '_' }
 
     companion object {
         protected val KEYWORDS = setOf(
@@ -619,7 +634,8 @@ open class Writer(
 
         fun write(v: Node, extrasMap: ExtrasMap? = null) =
             write(v, StringBuilder(), extrasMap).toString()
-        fun <T: Appendable> write(v: Node, app: T, extrasMap: ExtrasMap? = null) =
+
+        fun <T : Appendable> write(v: Node, app: T, extrasMap: ExtrasMap? = null) =
             app.also { Writer(it, extrasMap).write(v) }
     }
 }

@@ -1,12 +1,16 @@
 package kastree.psi
 
+import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiComment
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiWhiteSpace
 import kastree.ast.ExtrasMap
 import kastree.ast.Node
 import org.jetbrains.kotlin.KtNodeTypes
-import org.jetbrains.kotlin.com.intellij.lang.ASTNode
-import org.jetbrains.kotlin.com.intellij.psi.PsiComment
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.com.intellij.psi.PsiWhiteSpace
+//import org.jetbrains.kotlin.com.intellij.lang.ASTNode
+//import org.jetbrains.kotlin.com.intellij.psi.PsiComment
+//import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+//import org.jetbrains.kotlin.com.intellij.psi.PsiWhiteSpace
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
@@ -14,6 +18,14 @@ import org.jetbrains.kotlin.psi.psiUtil.*
 import java.util.*
 
 open class Converter {
+    //// new stuff
+//    open fun convertQualifiedExpression(v : KtQualifiedExpression) : Node.Expr.Qualified = Node.Expr.Qualified(
+//        qualifier = convertExpr(v.receiverExpression),
+//        qualified = convertExpr(v.selectorExpression ?: error("No qualified rhs for ${v.text}"))
+//    )
+    
+    ////////////////////
+    
     protected open fun onNode(node: Node, elem: PsiElement) { }
 
     open fun convertAnnotated(v: KtAnnotatedExpression) = Node.Expr.Annotated(
@@ -252,6 +264,7 @@ open class Converter {
         is KtForExpression -> convertFor(v)
         is KtWhileExpressionBase -> convertWhile(v)
         is KtBinaryExpression -> convertBinaryOp(v)
+//        is KtQualifiedExpression -> convertQualifiedExpression(v)
         is KtQualifiedExpression -> convertBinaryOp(v)
         is KtUnaryExpression -> convertUnaryOp(v)
         is KtBinaryExpressionWithTypeRHS -> convertTypeOp(v)
@@ -741,7 +754,9 @@ open class Converter {
                 // As a special case, we make sure all non-block comments start a line when "before"
                 if (it is Node.Extra.Comment && !it.startsLine && it.text.startsWith("//")) it.copy(startsLine = true)
                 else it
-            }.also { if (it.isNotEmpty()) extrasBefore[elemId] = it }
+            }.also {
+                if (it.isNotEmpty()) extrasBefore[elemId] = it
+            }
             convertExtras(withinElems).also { if (it.isNotEmpty()) extrasWithin[elemId] = it }
             convertExtras(afterElems).also { if (it.isNotEmpty()) extrasAfter[elemId] = it }
         }
