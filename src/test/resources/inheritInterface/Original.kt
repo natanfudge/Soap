@@ -1,0 +1,1 @@
+class Foo: net.obf.TestObf

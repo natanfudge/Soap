@@ -1,0 +1,1 @@
+val x: net.obf.TestObf.net.obf.TestObfInner

@@ -1,4 +1,6 @@
-out/
+out/**
 build/
 .gradle/
 .idea/
+k
+tempResult.kt

@@ -1,0 +1,1 @@
+val x: deobf.TestDeobfGeneric<deobf.TestDeobf>.deobf.TestDeobfInnerGeneric<Int> = listOf()

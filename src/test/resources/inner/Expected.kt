@@ -1,0 +1,1 @@
+val x: deobf.TestDeobf.deobf.TestDeobfInner

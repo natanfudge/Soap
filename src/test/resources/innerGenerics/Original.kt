@@ -1,0 +1,1 @@
+val x: net.obf.TestObfGeneric<net.obf.TestObf>.net.obf.TestObfInnerGeneric<Int> = listOf()

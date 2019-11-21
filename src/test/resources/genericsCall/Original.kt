@@ -1,0 +1,1 @@
+val x = listOf<net.obf.TestObf>()

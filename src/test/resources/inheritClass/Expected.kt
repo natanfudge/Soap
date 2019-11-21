@@ -1,0 +1,1 @@
+class Foo : deobf.TestDeobf()

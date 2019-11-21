@@ -1,2 +1,6 @@
 import deobf.TestDeobf
-val x : TestDeobf? = null
+//foo
+/**
+ * Bar
+ */
+val x: TestDeobf? = null

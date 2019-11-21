@@ -1,0 +1,1 @@
+val x = { y: net.obf.TestObf -> 2 }
